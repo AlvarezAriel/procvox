@@ -1,0 +1,162 @@
+@import "palette.shp"
+@import "presets"
+Axiom {
+	@size(512, 512+120, 512)
+	House
+	MyGrass
+}
+
+Empty { @discard }
+Solid { $cube }
+
+House {
+	\split_y(
+	  \s(1, Foundation),
+	  \s(1, GroundStorey),
+	  \s(1, Storey),
+	  \s(1, Storey),
+	  \f(16, Ceiling))
+}
+
+Ceiling {
+	@size(sx * 1.4, sy, sz * 1.4)
+	@translate(-0.5 * sx, 0.0, -0.5 * sz)
+	@color MAT_DOOR
+	Solid
+}
+
+Foundation {
+	@size(sx * 1.36, sy, sz * 1.36)
+	@translate(-0.5 * sx + 16, 0.0, -0.5 * sz)
+	@color MAT_WALL
+	\repeat_x(80, FoundationColumnRow)
+	
+}
+
+MyGrass {
+	@size(1024, 64, 1024)
+	Grass
+}
+
+FoundationColumnRow {
+	\repeat_z(80, FoundationColumn)
+}
+
+FoundationColumn {
+	\split_z(
+	  \s(1, Empty),
+	  \f(32, Column),
+	  \s(1, Empty))
+}
+
+Column {
+	@size(x: 32, z: 32)
+	$cylinder
+}
+
+GroundStorey {
+	@set(isGround, 1)
+	Storey
+}
+
+Storey {
+	@size(sx, sy, sz)
+	@translate(-0.5 * sx, 0.0, -0.5 * sz)
+	@set(floor_height, sy)
+	\split_y(
+	  \f(16, FloorDivider),
+	  \s(1.0, Floor))
+}
+
+Floor {
+	@color MAT_WALL
+	\split_x(
+	  \f(11, FloorWall),
+	  \s(1, Empty),
+	  \f(11, FloorWall))
+	\split_z(
+	  \f(11, FloorWall),
+	  \s(1, Empty),
+	  \f(11, FloorWall))
+}
+
+FloorWall {
+	@set(wall_axis, sx > sz ? 0 : 2)
+	\repeat(wall_axis, 120, WallWithDoor)
+}
+
+WallWithDoor {
+	\split(wall_axis,
+	  \s(1, Solid),
+	  \f(54, WoodenDoor),
+	  \s(1, Solid))
+}
+
+FloorDivider {
+	@scale_center_x 1.34
+	@scale_center_z 1.34
+	@scale_y 4
+	@color MAT_DOOR
+	\split_y(
+	  \f(16, Solid),
+	  \s(1, Balcony))
+}
+
+Balcony {
+	\split_x(
+	  \f(8, Fence),
+	  \s(1, Empty),
+	  \f(8, Fence))
+	\split_z(
+	  \f(8, Fence),
+	  \s(1, Empty),
+	  \f(8, Fence))
+}
+
+Fence {
+	@set(wall_axis, sx > sz ? 0 : 2)
+	\split(wall_axis,
+	  \f(16, FenceColumn),
+	  \s(1, FenceRepeat),
+	  \f(16, FenceColumn))
+}
+
+FenceColumn {
+	@size(y: floor_height)
+	Solid
+}
+
+FenceRepeat {
+	\repeat(wall_axis, 32, FenceIron)
+}
+
+WoodenDoor {
+	\split_y(
+	  \f(94, RawDoor),
+	  \s(1, Solid))
+}
+
+RawDoor {
+	@rotate_y(wall_axis == 0 ? 0 : -90)
+	@translate_z(wall_axis == 0 ? 0 : -11)
+	$vox("wooden_window.vox")
+}
+
+FenceIron {
+	\split(wall_axis,
+	  \s(1, Empty),
+	  \f(8, FenceBar),
+	  \s(1, Empty))
+	FenceHandrail
+}
+
+FenceHandrail {
+	\split_y(
+	  \s(1, Empty),
+	  \f(6, Solid))
+}
+
+FenceBar {
+	$cylinder
+}
+

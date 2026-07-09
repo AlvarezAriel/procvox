@@ -1,0 +1,80 @@
+@import "palette.shp"
+
+param STRIPE = 4
+param CHECK  = 4
+
+Axiom {
+
+  @size(1024, 1024, 8)
+  @camera(x: 512, y: 512, z: 1100, yaw: 180, pitch: 0, fov: 60)
+  Wall
+}
+
+Wall {
+  \split_y(
+    \s(1, RowLower),
+    \s(1, RowUpper))
+}
+
+RowUpper {
+  \split_x(
+    \s(1, PanelVertical),
+    \s(1, PanelHorizontal))
+}
+
+RowLower {
+  \split_x(
+    \s(1, PanelChecker),
+    \s(1, PanelJail))
+}
+
+PanelVertical { \repeat_x(2 * STRIPE, VPair) }
+VPair {
+  \split_x(
+    \f(STRIPE, White),
+    \f(STRIPE, Black))
+}
+
+PanelHorizontal { \repeat_y(2 * STRIPE, HPair) }
+HPair {
+  \split_y(
+    \f(STRIPE, White),
+    \f(STRIPE, Black))
+}
+
+PanelChecker { \repeat_x(2 * CHECK, CheckCol) }
+CheckCol {
+  \split_x(
+    \f(CHECK, CheckColA),
+    \f(CHECK, CheckColB))
+}
+CheckColA { \repeat_y(2 * CHECK, CheckPairA) }
+CheckColB { \repeat_y(2 * CHECK, CheckPairB) }
+CheckPairA { \split_y(\f(CHECK, White), \f(CHECK, Black)) }
+CheckPairB { \split_y(\f(CHECK, Black), \f(CHECK, White)) }
+
+PanelJail {
+  JailWall
+  JailBars
+}
+JailWall {
+  @color MAT_WHITE
+  $cube
+}
+JailBars {
+  @translate_z(32)
+  \repeat_x(128, JailCell)
+}
+JailCell {
+  \split_x(
+    \f(12, JailBar),
+    \s(1, Empty))
+}
+JailBar {
+  @color MAT_BLACK
+  $cube
+}
+
+White { @color MAT_WHITE  $cube }
+Black { @color MAT_BLACK  $cube }
+Empty { @discard }

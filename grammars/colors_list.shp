@@ -1,0 +1,18 @@
+@import "palette.shp"
+
+Axiom {
+  @size(60, 16, 16)
+  \split_x(
+    \f(20, SingleColorCube),
+    \f(20, MottledCube))
+}
+
+SingleColorCube {
+  @color MAT_WALL
+  $cube
+}
+
+MottledCube {
+  @color pick(MAT_WALL, MAT_SILL, MAT_HEADER)
+  $cube
+}

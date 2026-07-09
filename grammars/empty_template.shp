@@ -1,0 +1,8 @@
+@import "palette.shp"
+
+Axiom {
+  @size(64, 64, 64)
+  @camera(x: 117, y: 102, z: -105, yaw: -32, pitch: -24, fov: 50)
+  @color MAT_STONE
+  $cube
+}

@@ -1,0 +1,74 @@
+@import "palette.shp"
+@import "presets"
+
+param leonardo_exponent = 1.8
+const wr = 1.0 / pow(2.0, 1.0 / leonardo_exponent)
+
+param n_iters = 5
+param init_l = 42.0
+param init_w = 12.0
+
+param leaves_volume_radius = 32
+
+Axiom {
+
+  @camera(x: 170, y: 300, z: -470, yaw: 0, pitch: -16, fov: 55)
+
+  @color MAT_DOOR
+  @set(tip_ratio, wr)
+  @size(x: 340, z: 350)
+
+  \distribute_voronoi_xz(2,
+    Branch(l: floor(rand_range(38.0, 54.0)),
+           w: floor(rand_range(8.0, 16.0)),
+           n: floor(rand_range(6, 8))))
+
+  GrassFloor
+}
+
+GrassFloor {
+  @size(x: 512, z: 512)
+  @translate(-256, 0, -256)
+  Grass(top: MAT_GRASS_TOP, bottom: MAT_GRASS_BOTTOM)
+}
+
+Branch(l, w, n)
+  :: n == 0 {
+    @size(x: floor(rand_range(leaves_volume_radius, 46)),
+          y: leaves_volume_radius,
+          z: floor(rand_range(leaves_volume_radius, 46)))
+    @translate(-0.5 * sx, -0.5 * sy, -0.5 * sz)
+    @color pick(MAT_LEAVES, MAT_LEAVES_B)
+    $sphere(rand_range(0.03, 0.05))
+  }
+  :: else {
+    @size(w, l, w)
+    TrunkSegment
+    @translate_y l
+    SideBranch(tilt: rand_range(-20, 30),
+               spin: rand_range(-90, 120),
+               l:    l * rand_range(0.8, 0.89),
+               w:    w * wr,
+               n:    n - 1)
+    SideBranch(tilt: rand_range(-10, 50),
+               spin: rand_range(-101, 140),
+               l:    l * rand_range(0.3, 0.81),
+               w:    w * wr,
+               n:    n - 1)
+    SideBranch(tilt: rand_range(-20, 60),
+               spin: rand_range(-40, 90),
+               l:    l * rand_range(0.5, 0.93),
+               w:    w * wr,
+               n:    n - 1)
+  }
+
+TrunkSegment {
+  @translate(-0.5 * sx, 0, -0.5 * sz)
+  $cone
+}
+
+SideBranch(tilt, spin, l, w, n) {
+  @rotate_z tilt
+  @rotate_y spin
+  Branch(l: l, w: w, n: n)
+}

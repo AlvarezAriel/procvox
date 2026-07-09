@@ -1,0 +1,174 @@
+@import "palette.shp"
+
+const HOUSE_HALF = 352
+const COURT_HALF = 192
+const FLOOR_H    = 200
+const WALL_T     = 16
+const SLAB_T     = 8
+
+const HOUSE_W    = HOUSE_HALF * 2
+const COURT_W    = COURT_HALF * 2
+const TOTAL_H    = FLOOR_H   * 2
+const INNER_SIZE = COURT_W + 2 * WALL_T
+
+const SILL_H   = 32
+const HEADER_H = 32
+const WIN_BAY  = 96
+const WIN_W    = 48
+const DOOR_W   = 96
+const DOOR_H   = 120
+const COL_BAY  = 96
+const COL_W    = 24
+
+Axiom {
+  @size(HOUSE_W, TOTAL_H, HOUSE_W)
+  House
+}
+
+House {
+  \split_y(
+    \s(1, GroundFloor),
+    \s(1, UpperFloor))
+}
+
+GroundFloor {
+  @color MAT_SILL
+  @set(floor, 0)
+  Storey
+}
+
+UpperFloor {
+  @color MAT_WALL
+  @set(floor, 1)
+  Storey
+}
+
+Storey {
+  \split_y(
+    \f(SLAB_T, FloorSlab),
+    \s(1, ShellPair),
+    \f(SLAB_T, CeilingSlab))
+}
+
+FloorSlab
+  :: floor == 0 { $cube }
+  :: else       { RingSlab }
+
+CeilingSlab { RingSlab }
+
+RingSlab {
+  \split_z(
+    \s(1, Solid),
+    \f(COURT_W, RingSlabSides),
+    \s(1, Solid))
+}
+
+RingSlabSides {
+  \split_x(
+    \s(1, Solid),
+    \f(COURT_W, Empty),
+    \s(1, Solid))
+}
+
+ShellPair { OuterShell }
+
+OuterShell {
+  \split_z(
+    \f(WALL_T, Outer),
+    \s(1, OuterMiddleZ),
+    \f(WALL_T, SouthOuter))
+}
+
+OuterMiddleZ {
+  \split_x(
+    \f(WALL_T, Outer),
+    \s(1, InnerVolume),
+    \f(WALL_T, Outer))
+}
+
+InnerVolume {
+  \split_z(
+    \s(1, Empty),
+    \f(INNER_SIZE, InnerVolumeMid),
+    \s(1, Empty))
+}
+
+InnerVolumeMid {
+  \split_x(
+    \s(1, Empty),
+    \f(INNER_SIZE, InnerShell),
+    \s(1, Empty))
+}
+
+InnerShell {
+  \split_z(
+    \f(WALL_T, InnerWall),
+    \s(1, InnerSides),
+    \f(WALL_T, InnerWall))
+}
+
+InnerSides {
+  \split_x(
+    \f(WALL_T, InnerWall),
+    \s(1, Empty),
+    \f(WALL_T, InnerWall))
+}
+
+Empty { @discard }
+Solid { $cube }
+
+Outer
+  :: floor == 0 { $cube }
+  :: else       { WindowedWall }
+
+SouthOuter
+  :: floor == 0 { DoorWall }
+  :: else       { WindowedWall }
+
+InnerWall
+  :: floor == 0 { Colonnade }
+  :: else       { $cube }
+
+WindowedWall {
+  @set(wall_axis, sx > sz ? 0 : 2)
+  \repeat(wall_axis, WIN_BAY, WindowBay)
+}
+
+WindowBay {
+  \split_y(
+    \f(SILL_H, Solid),
+    \s(1, WindowRow),
+    \f(HEADER_H, Solid))
+}
+
+WindowRow {
+  \split(wall_axis,
+    \s(1, Solid),
+    \f(WIN_W, Empty),
+    \s(1, Solid))
+}
+
+DoorWall {
+  \split_x(
+    \s(1, Solid),
+    \f(DOOR_W, DoorBay),
+    \s(1, Solid))
+}
+
+DoorBay {
+  \split_y(
+    \f(DOOR_H, Empty),
+    \s(1, Solid))
+}
+
+Colonnade {
+  @set(wall_axis, sx > sz ? 0 : 2)
+  \repeat(wall_axis, COL_BAY, ColumnBay)
+}
+
+ColumnBay {
+  \split(wall_axis,
+    \s(1, Empty),
+    \f(COL_W, Solid),
+    \s(1, Empty))
+}

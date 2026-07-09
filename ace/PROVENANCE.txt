@@ -1,0 +1,27 @@
+Ace editor: minified, drop-in build.
+
+Source: https://github.com/ajaxorg/ace-builds
+Version: 1.44.0
+Commit:  184177d
+Fetched: 2026-05-31
+
+Files in this directory:
+  ace.js                 - editor core (default text mode is bundled)
+  ext-language_tools.js  - autocomplete/snippets extension (vendored, same build)
+  theme-monokai.js       - dark theme used by the left-panel editor
+  mode-lisp.js           - temporary syntax mode for .shp grammars
+  mode-shp.js            - hand-written .shp syntax mode (NOT vendored)
+  shp_completions.js     - hand-written .shp autocomplete symbol table (NOT
+                           vendored; mirrors src/shp op/builtin signatures)
+
+To bump the version:
+  git clone --depth=1 https://github.com/ajaxorg/ace-builds.git /tmp/ace-builds
+  cp /tmp/ace-builds/src-min-noconflict/{ace,ext-language_tools,theme-monokai,mode-lisp}.js web/ace/
+  rm -rf /tmp/ace-builds
+  # Update Version + Commit + Fetched above. Do NOT overwrite mode-shp.js /
+  # shp_completions.js; they are maintained in this repo.
+
+These files are already production-built and minified. tools/build.odin
+copies them through to dist/ verbatim (no re-minification pass); running
+the JS state machine over already-minified code is wasteful and risks
+mangling Ace's loader.
